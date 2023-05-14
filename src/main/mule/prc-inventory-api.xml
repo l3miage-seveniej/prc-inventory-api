@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="prc-inventory-apiFlow" doc:id="141aefb4-56ca-4e9e-9ca2-1434e38d4b0a" >
+		<http:listener doc:name="Listener" doc:id="ca961b92-63e5-475d-8177-7122e9f32693" config-ref="HTTP_Listener_config" path="/process"/>
+		<http:request method="GET" doc:name="Request" doc:id="e7fed07b-5e75-4e95-9201-d8722ebe2a54" config-ref="HTTP_Request_configuration" path="/api/SFTP">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "jifjif",
+	"client_id" : "jifjif"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="1995e30c-acec-42e0-8fd5-dc9523042c30" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+payload[0] map ( payload01 , indexOfPayload01 ) -> {
+	id:   payload01.id,
+	title: payload01.title,
+	type_article: (payload01.type_article default "") ,
+	stock_available: payload01.stock_available as Number,
+	data_update: payload01.data_update 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="9a413858-328d-49d8-bdda-cc3e3225c219" config-ref="HTTP_Request_configuration1" path="/api/articles">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "jifjifiif",
+	"client_id" : "jidjid"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	forceParams : "jifjif"
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+</mule>
