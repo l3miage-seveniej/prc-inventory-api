@@ -46,7 +46,7 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 }]]]></http:query-params>
 		</http:request>
 		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4a8c83b6-684f-4cf8-85f3-50e1df7ca25f" >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4a8c83b6-684f-4cf8-85f3-50e1df7ca25f" type="VALIDATION:EMPTY_COLLECTION">
 				<ee:transform doc:name="Transform Message" doc:id="d6e2620c-46a4-4b92-a010-bdcd44209b92" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
