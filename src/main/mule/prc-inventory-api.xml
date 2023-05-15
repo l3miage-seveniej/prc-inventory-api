@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<flow name="prc-inventory-apiFlow" doc:id="141aefb4-56ca-4e9e-9ca2-1434e38d4b0a" >
 		<http:listener doc:name="Listener" doc:id="ca961b92-63e5-475d-8177-7122e9f32693" config-ref="HTTP_Listener_config" path="/process"/>
 		<http:request method="GET" doc:name="Get files from SFTP" doc:id="e7fed07b-5e75-4e95-9201-d8722ebe2a54" config-ref="HTTP_Request_configuration" path="/api/SFTP">
@@ -15,6 +16,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	"client_id" : "jifjif"
 }]]]></http:headers>
 		</http:request>
+		<validation:is-not-empty-collection doc:name="Is not empty collection" doc:id="7d85a219-7e72-4464-9f80-f02745f82167" message="Il n'ya pas de fichier présent"/>
 		<ee:transform doc:name="stock as Number" doc:id="1995e30c-acec-42e0-8fd5-dc9523042c30" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -43,5 +45,19 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 	"forceParams" : "kodo"
 }]]]></http:query-params>
 		</http:request>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4a8c83b6-684f-4cf8-85f3-50e1df7ca25f" >
+				<ee:transform doc:name="Transform Message" doc:id="d6e2620c-46a4-4b92-a010-bdcd44209b92" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'message':error.description
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>
